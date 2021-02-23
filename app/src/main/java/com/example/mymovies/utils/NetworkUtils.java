@@ -1,7 +1,16 @@
 package com.example.mymovies.utils;
 
 import android.net.Uri;
+import android.os.AsyncTask;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -10,20 +19,19 @@ public class NetworkUtils {
 
     private static final String PARAMS_API_KEY = "api_key";
     private static final String PARAMS_LANGUAGE = "language";
-    private static final String PARAMS_SORT_BY ="sort_by";
+    private static final String PARAMS_SORT_BY = "sort_by";
     private static final String PARAMS_PAGE = "page";
 
     private static final String API_KEY = "f68a8a84b78dcf350e121c7d329586d5";
     private static final String LANGUAGE_VALUE = "ru-RU";
     private static final String SORT_BY_POPULARITY = "Popular.desc";
-    private static final String SORT_BY_TOP_RATED ="vote_average.desc";
+    private static final String SORT_BY_TOP_RATED = "vote_average.desc";
 
     public static final int POPULARITY = 0;
     public static final int TOP_RATED = 1;
 
 
-
-    public static URL buildURl(int sort_by, int page) {
+    private static URL buildURl(int sort_by, int page) {
         URL result = null;
 
         String methodOfSort;
@@ -34,11 +42,11 @@ public class NetworkUtils {
         }
 
         Uri uri = Uri.parse(BASE_URL).buildUpon()
-        .appendQueryParameter(PARAMS_API_KEY, API_KEY)
-        .appendQueryParameter(PARAMS_LANGUAGE, LANGUAGE_VALUE)
-        .appendQueryParameter(PARAMS_SORT_BY, methodOfSort)
-        .appendQueryParameter(PARAMS_PAGE, Integer.toString(page))
-        .build();
+                .appendQueryParameter(PARAMS_API_KEY, API_KEY)
+                .appendQueryParameter(PARAMS_LANGUAGE, LANGUAGE_VALUE)
+                .appendQueryParameter(PARAMS_SORT_BY, methodOfSort)
+                .appendQueryParameter(PARAMS_PAGE, Integer.toString(page))
+                .build();
 
         try {
             result = new URL(uri.toString());
@@ -46,6 +54,42 @@ public class NetworkUtils {
             e.printStackTrace();
         }
         return result;
+    }
+
+//    public static JSONObject getJSONFromNetwork(int sort_by, int page) {
+//        URL url = buildURl(sort_by, page)
+//    }
+
+    private static class JSONLoadTask extends AsyncTask<URL, Void, JSONObject> {
+        JSONObject result = null;
+
+        @Override
+        protected JSONObject doInBackground(URL... urls) {
+            if (urls == null || urls.length == 0) {
+                return result;
+            }
+            HttpURLConnection connection = null;
+            try {
+                connection = (HttpURLConnection) urls[0].openConnection();
+                InputStream inputStream = connection.getInputStream();
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader reader = new BufferedReader(inputStreamReader);
+                StringBuilder builder = new StringBuilder();
+                String line = reader.readLine();
+                while (line != null) {
+                    builder.append(line);
+                    line = reader.readLine();
+                }
+                result = new JSONObject(builder.toString());
+            } catch (IOException | JSONException e) {
+                e.printStackTrace();
+            } finally {
+                if (connection != null) {
+                    connection.disconnect();
+                }
+            }
+            return result;
+        }
     }
 
 

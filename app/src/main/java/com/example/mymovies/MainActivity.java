@@ -4,8 +4,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.mymovies.utils.NetworkUtils;
+
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -14,7 +17,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        String url = NetworkUtils.buildURl(NetworkUtils.POPULARITY, 1).toString();
-        Log.i("MyResult", url);
+        JSONObject jsonObject = NetworkUtils.getJSONFromNetwork(NetworkUtils.TOP_RATED, 1);
+        if (jsonObject == null) {
+            Toast.makeText(this, "Error", Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(this, "Successfully", Toast.LENGTH_SHORT).show();
+        }
+//        Log.i("MyResult", jsonObject.toString());
     }
 }

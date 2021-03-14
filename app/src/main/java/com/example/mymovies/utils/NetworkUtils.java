@@ -25,7 +25,7 @@ public class NetworkUtils {
 
     private static final String API_KEY = "f68a8a84b78dcf350e121c7d329586d5";
     private static final String LANGUAGE_VALUE = "ru-RU";
-    private static final String SORT_BY_POPULARITY = "Popular.desc";
+    private static final String SORT_BY_POPULARITY = "popularity.desc";
     private static final String SORT_BY_TOP_RATED = "vote_average.desc";
 
     public static final int POPULARITY = 0;

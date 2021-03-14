@@ -20,6 +20,29 @@ public class JSONUtils {
     private static final String KEY_VOTE_AVERAGE = "vote_average";
     private static final String KEY_RELEASE_DATE = "release_date";
 
+    public static ArrayList<Movie> getMovieFromJSON(JSONObject jsonObject) {
+        ArrayList<Movie> result = new ArrayList<>();
+        try {
+            JSONArray jsonArray = jsonObject.getJSONArray(KEY_RESULTS);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject objectMovie = jsonArray.getJSONObject(i);
+                int id = objectMovie.getInt(KEY_ID);
+                int voteCount = objectMovie.getInt(KEY_VOTE_COUNT);
+                String title = objectMovie.getString(KEY_TITLE);
+                String originalTitle = objectMovie.getString(KEY_ORIGINAL_TITLE);
+                String overview = objectMovie.getString(KEY_OVERVIEW);
+                String posterPath = objectMovie.getString(KEY_POSTER_PATH);
+                String backdropPath = objectMovie.getString(KEY_BACKDROP_PATH);
+                double voteAverage = objectMovie.getDouble(KEY_VOTE_AVERAGE);
+                String releaseDate = objectMovie.getString(KEY_RELEASE_DATE);
+                Movie movie = new Movie(id, voteCount, title, originalTitle, overview, posterPath, backdropPath, voteAverage, releaseDate);
+                result.add(movie);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
 
 
 }

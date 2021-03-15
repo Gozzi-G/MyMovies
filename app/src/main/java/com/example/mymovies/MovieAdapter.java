@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.mymovies.data.Movie;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;

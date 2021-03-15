@@ -1,6 +1,6 @@
 package com.example.mymovies.utils;
 
-import com.example.mymovies.Movie;
+import com.example.mymovies.data.Movie;
 
 import org.json.JSONArray;
 import org.json.JSONException;

@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.mymovies.utils.JSONUtils;
 import com.example.mymovies.utils.NetworkUtils;
@@ -47,6 +48,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         switchSort.setChecked(false);
+        movieAdapter.setOnPosterClickListener(new MovieAdapter.OnPosterClickListener() {
+            @Override
+            public void onPosterClick(int position) {
+                Toast.makeText(MainActivity.this, "Clicked " + position, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public void onClickSetPopularity(View view) {

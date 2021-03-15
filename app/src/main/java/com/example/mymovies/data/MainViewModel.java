@@ -33,11 +33,56 @@ public class MainViewModel extends AndroidViewModel {
         return null;
     }
 
+    public void deleteAllMovies() {
+        new DeleteMovieTask().execute();
+    }
+
+    public void insertMovies(Movie movie) {
+        new InsertMovieTask().execute(movie);
+    }
+
+    public void deleteMovie(Movie movie) {
+        new DeleteTask().execute(movie);
+    }
+
+    private static class DeleteTask extends AsyncTask<Movie, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Movie... movies) {
+            if (movies != null && movies.length > 0) {
+                database.movieDao().deleteMovie(movies[0]);
+            }
+            return null;
+        }
+    }
+
+    private static class InsertMovieTask extends AsyncTask<Movie, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Movie... movies) {
+            if (movies != null && movies.length > 0) {
+                database.movieDao().insertMovie(movies[0]);
+            }
+            return null;
+        }
+    }
+
+    private static class DeleteMovieTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... integers) {
+            if (integers != null && integers.length > 0) {
+                database.movieDao().deleteAllMovies();
+            }
+            return null;
+        }
+    }
+
     private static class GetMovieTask extends AsyncTask<Integer, Void, Movie> {
 
         @Override
         protected Movie doInBackground(Integer... integers) {
-            if(integers != null && integers.length > 0) {
+            if (integers != null && integers.length > 0) {
                 return database.movieDao().getMovieById(integers[0]);
             }
             return null;

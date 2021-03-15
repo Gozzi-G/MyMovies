@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:background="@color/colorPrimaryDark" >
 
     <Switch
         android:id="@+id/switchSort"
@@ -19,18 +20,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/most_popular"
+        android:onClick="onClickSetPopularity"
         app:layout_constraintBottom_toBottomOf="@+id/switchSort"
         app:layout_constraintEnd_toStartOf="@+id/switchSort"
-        app:layout_constraintTop_toTopOf="@+id/switchSort" />
+        app:layout_constraintTop_toTopOf="@+id/switchSort"
+        android:textColor="@color/white_color"/>
 
     <TextView
         android:id="@+id/textViewTopRated"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/top_rated"
+        android:onClick="onClickSetTopRated"
         app:layout_constraintBottom_toBottomOf="@+id/switchSort"
         app:layout_constraintStart_toEndOf="@+id/switchSort"
-        app:layout_constraintTop_toTopOf="@+id/switchSort" />
+        app:layout_constraintTop_toTopOf="@+id/switchSort"
+        android:textColor="@color/white_color"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewPosters"
@@ -39,5 +44,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/switchSort" />
+        app:layout_constraintTop_toBottomOf="@+id/switchSort"
+        android:layout_marginTop="8dp"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

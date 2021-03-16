@@ -7,6 +7,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class JSONUtils {
     private static final String KEY_RESULTS = "results";
@@ -27,6 +28,9 @@ public class JSONUtils {
 
     public static ArrayList<Movie> getMovieFromJSON(JSONObject jsonObject) {
         ArrayList<Movie> result = new ArrayList<>();
+        if (jsonObject == null) {
+            return result;
+        }
         try {
             JSONArray jsonArray = jsonObject.getJSONArray(KEY_RESULTS);
             for (int i = 0; i < jsonArray.length(); i++) {

@@ -6,7 +6,6 @@ import android.os.AsyncTask;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.ViewModel;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -22,6 +21,10 @@ public class MainViewModel extends AndroidViewModel {
         movies = database.movieDao().getAllMovies();
     }
 
+    public LiveData<List<Movie>> getMovies() {
+        return movies;
+    }
+
     public Movie getMovieById(int id) {
         try {
             return new GetMovieTask().execute(id).get();
@@ -34,7 +37,7 @@ public class MainViewModel extends AndroidViewModel {
     }
 
     public void deleteAllMovies() {
-        new DeleteMovieTask().execute();
+        new DeleteMoviesTask().execute();
     }
 
     public void insertMovies(Movie movie) {
@@ -67,13 +70,11 @@ public class MainViewModel extends AndroidViewModel {
         }
     }
 
-    private static class DeleteMovieTask extends AsyncTask<Void, Void, Void> {
+    private static class DeleteMoviesTask extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected Void doInBackground(Void... integers) {
-            if (integers != null && integers.length > 0) {
-                database.movieDao().deleteAllMovies();
-            }
+            database.movieDao().deleteAllMovies();
             return null;
         }
     }

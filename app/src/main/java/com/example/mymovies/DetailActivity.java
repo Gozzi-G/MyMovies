@@ -20,7 +20,7 @@ public class DetailActivity extends AppCompatActivity {
     private TextView textViewOverview;
 
     private int id;
-    private MainViewModel viewModel;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +34,12 @@ public class DetailActivity extends AppCompatActivity {
         textViewReleaseDate =findViewById(R.id.textViewReleaseDate);
         textViewOverview = findViewById(R.id.textViewOverview);
 
+        Intent intent = getIntent();
+        if (intent != null && intent.hasExtra("id")) {
+            id = intent.getIntExtra("id", -1);
+        } else {
+            finish();
+        }
 
     }
 }

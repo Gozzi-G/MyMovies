@@ -48,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
         textViewPopularity = findViewById(R.id.textViewPopularity);
         textViewTopRated = findViewById(R.id.textViewTopRated);
         viewModel = new ViewModelProvider(this).get(MainViewModel.class);
-//        viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
 
         recyclerViewPosters.setLayoutManager(new GridLayoutManager(this, 2));
         movieAdapter = new MovieAdapter();
@@ -63,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         switchSort.setChecked(false);
+
         movieAdapter.setOnPosterClickListener(new MovieAdapter.OnPosterClickListener() {
             @Override
             public void onPosterClick(int position) {
@@ -105,9 +105,9 @@ public class MainActivity extends AppCompatActivity {
     private void setMethodOfSort(boolean isTopRated) {
         int methodOfSort;
         if(isTopRated) {
-            methodOfSort = NetworkUtils.TOP_RATED;
             textViewTopRated.setTextColor(getResources().getColor(R.color.colorAccent));
             textViewPopularity.setTextColor(getResources().getColor(R.color.white_color));
+            methodOfSort = NetworkUtils.TOP_RATED;
         } else {
             methodOfSort = NetworkUtils.POPULARITY;
             textViewPopularity.setTextColor(getResources().getColor(R.color.colorAccent));

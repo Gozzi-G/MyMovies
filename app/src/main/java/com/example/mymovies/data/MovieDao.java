@@ -10,6 +10,7 @@ import java.util.List;
 
 @Dao
 public interface MovieDao {
+// Общие фильмы
     @Query("SELECT * FROM movies")
     LiveData<List<Movie>> getAllMovies();
 
@@ -24,4 +25,17 @@ public interface MovieDao {
 
     @Delete
     void deleteMovie(Movie movie);
+
+// Любимые фильмы
+    @Query("SELECT * FROM movies")
+    LiveData<List<FavoriteMovie>> getAllFavoriteMovies();
+
+    @Query("SELECT * FROM favorite_movies WHERE id == :movieId")
+    FavoriteMovie getFavoriteMovieById(int movieId);
+
+    @Insert
+    void insertFavoriteMovie(FavoriteMovie movie);
+
+    @Delete
+    void deleteFavoriteMovie(FavoriteMovie movie);
 }

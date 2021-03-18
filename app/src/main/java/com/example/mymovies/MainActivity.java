@@ -47,6 +47,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private static final int LOADER_ID = 100;
     private LoaderManager loaderManager;
 
+    private static int page = 1;
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -91,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         switchSort.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                page = 1;
                setMethodOfSort(isChecked);
             }
         });
@@ -118,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         moviesFromLiveData.observe(this, new Observer<List<Movie>>() {
             @Override
             public void onChanged(List<Movie> movies) {
-                movieAdapter.setMovies(movies);
+//                movieAdapter.setMovies(movies);
             }
         });
     }
@@ -180,6 +183,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             viewModel.deleteAllMovies();
             for (Movie movie: movies) {
                 viewModel.insertMovies(movie);
+                movieAdapter.addMovies(movies);
+                page++;
             }
         }
         loaderManager.destroyLoader(LOADER_ID);

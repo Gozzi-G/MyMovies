@@ -13,11 +13,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private Switch switchSort;
     private TextView textViewTopRated;
     private TextView textViewPopularity;
+    private ProgressBar progressBarLoading;
 
     private MainViewModel viewModel;
 
@@ -48,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private LoaderManager loaderManager;
 
     private static int page = 1;
+    private static int methodOfSort;
     private static boolean isLoading = false;
 
     @Override
@@ -74,11 +78,24 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         return super.onOptionsItemSelected(item);
     }
 
+     // Возвращает количество колонок в зависимости от ширины экрана
+    private int getColumnCount() {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int width = (int) (displayMetrics.widthPixels / displayMetrics.density);
+        if (width / 185 > 2) {
+            return width / 185;
+        } else {
+            return 2;
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        progressBarLoading = findViewById(R.id.progressBarLoading);
         loaderManager = LoaderManager.getInstance(this);
         recyclerViewPosters = findViewById(R.id.recyclerViewPosters);
         switchSort = findViewById(R.id.switchSort);
@@ -86,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         textViewTopRated = findViewById(R.id.textViewTopRated);
         viewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
-        recyclerViewPosters.setLayoutManager(new GridLayoutManager(this, 2));
+        recyclerViewPosters.setLayoutManager(new GridLayoutManager(this, getColumnCount()));
         movieAdapter = new MovieAdapter();
         recyclerViewPosters.setAdapter(movieAdapter);
 
@@ -95,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 page = 1;
-               setMethodOfSort(isChecked);
+                setMethodOfSort(isChecked);
             }
         });
 
@@ -114,7 +131,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         movieAdapter.setOnReachEndListener(new MovieAdapter.OnReachEndListener() {
             @Override
             public void onReachEnd() {
-                Toast.makeText(MainActivity.this, "The end of the list", Toast.LENGTH_SHORT).show();
+                if (!isLoading) {
+                    downloadData(methodOfSort, page);
+                }
             }
         });
 
@@ -122,7 +141,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         moviesFromLiveData.observe(this, new Observer<List<Movie>>() {
             @Override
             public void onChanged(List<Movie> movies) {
-//                movieAdapter.setMovies(movies);
+                if (page == 1) {
+                    movieAdapter.setMovies(movies);
+                }
             }
         });
     }
@@ -141,8 +162,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     // Метод сортировки фильмов, он также изменяет цвет текста в соответствии с выбранной сортировкой
     private void setMethodOfSort(boolean isTopRated) {
-        int methodOfSort;
-        if(isTopRated) {
+        if (isTopRated) {
             textViewTopRated.setTextColor(getResources().getColor(R.color.colorAccent));
             textViewPopularity.setTextColor(getResources().getColor(R.color.white_color));
             methodOfSort = NetworkUtils.TOP_RATED;
@@ -151,10 +171,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             textViewPopularity.setTextColor(getResources().getColor(R.color.colorAccent));
             textViewTopRated.setTextColor(getResources().getColor(R.color.white_color));
         }
-        downloadData(methodOfSort, 2);
+        downloadData(methodOfSort, page);
     }
 
-    private void downloadData (int methodOfSort, int page) {
+    private void downloadData(int methodOfSort, int page) {
 //        JSONObject jsonObject = NetworkUtils.getJSONFromNetwork(methodOfSort, 2);
 //        ArrayList<Movie> movies = JSONUtils.getMovieFromJSON(jsonObject);
 //        if (movies != null && !movies.isEmpty()) {
@@ -164,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 //            }
 //        }
 
-        URL url = NetworkUtils.buildURl(methodOfSort, 2);
+        URL url = NetworkUtils.buildURl(methodOfSort, page);
         Bundle bundle = new Bundle();
         bundle.putString("url", url.toString());
         loaderManager.restartLoader(LOADER_ID, bundle, this);
@@ -174,6 +194,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public Loader onCreateLoader(int id, @Nullable Bundle args) {
         NetworkUtils.JSONLoader jsonLoader = new NetworkUtils.JSONLoader(this, args);
+        jsonLoader.setOnStartJSONListener(new NetworkUtils.JSONLoader.OnStartJSONListener() {
+            @Override
+            public void onStartLoading() {
+                progressBarLoading.setVisibility(View.VISIBLE);
+                isLoading = true;
+            }
+        });
         return jsonLoader;
     }
 
@@ -181,13 +208,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public void onLoadFinished(@NonNull Loader loader, Object data) {
         ArrayList<Movie> movies = JSONUtils.getMovieFromJSON((JSONObject) data);
         if (movies != null && !movies.isEmpty()) {
-            viewModel.deleteAllMovies();
-            for (Movie movie: movies) {
-                viewModel.insertMovies(movie);
-                movieAdapter.addMovies(movies);
-                page++;
+            if (page == 1) {
+                viewModel.deleteAllMovies();
+                movieAdapter.clear();
             }
+            for (Movie movie : movies) {
+                viewModel.insertMovies(movie);
+            }
+            movieAdapter.addMovies(movies);
+            page++;
         }
+        isLoading = false;
+        progressBarLoading.setVisibility(View.INVISIBLE);
         loaderManager.destroyLoader(LOADER_ID);
     }
 

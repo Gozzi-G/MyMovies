@@ -38,7 +38,7 @@ public class NetworkUtils {
     private static final String LANGUAGE_VALUE = "ru-RU";
     private static final String SORT_BY_POPULARITY = "popularity.desc";
     private static final String SORT_BY_TOP_RATED = "vote_average.desc";
-    private static final String MIN_VOTE_COUNT_VALUE = "100";
+    private static final String MIN_VOTE_COUNT_VALUE = "500";
 
     public static final int POPULARITY = 0;
     public static final int TOP_RATED = 1;

@@ -3,17 +3,18 @@ package com.example.mymovies;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,7 +32,7 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Locale;
 
 public class DetailActivity extends AppCompatActivity {
 
@@ -42,6 +43,10 @@ public class DetailActivity extends AppCompatActivity {
     private TextView textViewReleaseDate;
     private TextView textViewOverview;
     private ImageView imageViewAddToFavorite;
+    private ScrollView scrollViewInfo;
+    private TextView textViewLabelReviews;
+    private TextView textViewLabelTrailers;
+
 
     private RecyclerView recyclerViewReviews;
     private RecyclerView recyclerViewTrailers;
@@ -52,6 +57,8 @@ public class DetailActivity extends AppCompatActivity {
     private MainViewModel viewModel;
     private Movie movie;
     private FavoriteMovie favoriteMovie;
+
+    private static String lang;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -82,6 +89,7 @@ public class DetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
+        lang = Locale.getDefault().getLanguage();
         imageViewBigPoster = findViewById(R.id.imageViewBigPoster);
         textViewTitle = findViewById(R.id.textViewTitle);
         textViewOriginalTitle = findViewById(R.id.textViewOriginalTitle);
@@ -89,6 +97,9 @@ public class DetailActivity extends AppCompatActivity {
         textViewReleaseDate = findViewById(R.id.textViewReleaseDate);
         textViewOverview = findViewById(R.id.textViewOverview);
         imageViewAddToFavorite = findViewById(R.id.imageViewAddToFavorite);
+        scrollViewInfo = findViewById(R.id.scrollViewInfo);
+        textViewLabelReviews = findViewById(R.id.textViewLabelReviews);
+        textViewLabelTrailers = findViewById(R.id.textViewLabelTrailers);
 
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra("id")) {
@@ -108,13 +119,14 @@ public class DetailActivity extends AppCompatActivity {
         setFavorite();
 
         recyclerViewReviews = findViewById(R.id.recyclerViewReview);
-        recyclerViewTrailers = findViewById(R.id.recyclerViewTrailer);
+        recyclerViewTrailers = findViewById(R.id.recyclerViewTrailers);
         reviewAdapter = new ReviewAdapter();
         trailerAdapter = new TrailerAdapter();
         trailerAdapter.setOnTrailerClickListener(new TrailerAdapter.OnTrailerClickListener() {
             @Override
             public void onTrailerClick(String url) {
-                Toast.makeText(DetailActivity.this, url, Toast.LENGTH_SHORT).show();
+                Intent  intentToTrailer = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                startActivity(intentToTrailer);
             }
         });
 
@@ -123,12 +135,19 @@ public class DetailActivity extends AppCompatActivity {
 
         recyclerViewReviews.setAdapter(reviewAdapter);
         recyclerViewTrailers.setAdapter(trailerAdapter);
-        JSONObject jsonObjectReviews = NetworkUtils.getJSONForReviews(movie.getId());
-        JSONObject jsonObjectTrailers = NetworkUtils.getJSONForVideos(movie.getId());
-        List<Review> reviews = JSONUtils.getReviewsFromJSON(jsonObjectReviews);
-        List<Trailer> trailers = JSONUtils.getTrailersFromJSON(jsonObjectTrailers);
+        JSONObject jsonObjectReviews = NetworkUtils.getJSONForReviews(movie.getId(), lang);
+        JSONObject jsonObjectTrailers = NetworkUtils.getJSONForVideos(movie.getId(), lang);
+        ArrayList<Review> reviews = JSONUtils.getReviewsFromJSON(jsonObjectReviews);
+        ArrayList<Trailer> trailers = JSONUtils.getTrailersFromJSON(jsonObjectTrailers);
         reviewAdapter.setReviews(reviews);
         trailerAdapter.setTrailers(trailers);
+        if (trailers.isEmpty()) {
+            textViewLabelTrailers.setVisibility(View.INVISIBLE);
+        }
+        if (reviews.isEmpty()) {
+            textViewLabelReviews.setVisibility(View.INVISIBLE);
+        }
+        scrollViewInfo.smoothScrollTo(0,0);
     }
 
     public void onClickChangeFavorite(View view) {
@@ -136,7 +155,7 @@ public class DetailActivity extends AppCompatActivity {
             viewModel.insertFavoriteMovie(new FavoriteMovie(movie));
             Toast.makeText(this, R.string.add_to_favorite, Toast.LENGTH_SHORT).show();
         } else {
-            viewModel.deleteFavoriteMovie(new FavoriteMovie(movie));
+            viewModel.deleteFavoriteMovie(favoriteMovie);
             Toast.makeText(this, R.string.delete_from_favorite, Toast.LENGTH_SHORT).show();
         }
         setFavorite();

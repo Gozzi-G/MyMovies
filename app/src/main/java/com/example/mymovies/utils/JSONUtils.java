@@ -21,7 +21,7 @@ public class JSONUtils {
     // Для видео
     private static final String KEY_KEY_OF_VIDEO = "key";
     private static final String KEY_NAME = "name";
-    private static final String BASE_YOUTUBE_URL = "https://www.youtube.com/whatch?v=";
+    private static final String BASE_YOUTUBE_URL = "https://www.youtube.com/watch?v=";
 
     // Вся информация о фильмах
     private static final String KEY_ID = "id";
@@ -69,9 +69,9 @@ public class JSONUtils {
         try {
             JSONArray jsonArray = jsonObject.getJSONArray(KEY_RESULTS);
             for(int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonObjectTrailer = jsonArray.getJSONObject(i);
-                String key = BASE_YOUTUBE_URL + jsonObjectTrailer.getString(KEY_KEY_OF_VIDEO);
-                String name = jsonObjectTrailer.getString(KEY_NAME);
+                JSONObject jsonObjectTrailers = jsonArray.getJSONObject(i);
+                String key = BASE_YOUTUBE_URL + jsonObjectTrailers.getString(KEY_KEY_OF_VIDEO);
+                String name = jsonObjectTrailers.getString(KEY_NAME);
                 Trailer trailer = new Trailer(key, name);
                 result.add(trailer);
             }

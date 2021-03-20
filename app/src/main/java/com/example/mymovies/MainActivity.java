@@ -35,6 +35,7 @@ import org.json.JSONObject;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks {
 
@@ -53,6 +54,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private static int page = 1;
     private static int methodOfSort;
     private static boolean isLoading = false;
+
+    private static String lang;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -95,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        lang = Locale.getDefault().getLanguage();
         progressBarLoading = findViewById(R.id.progressBarLoading);
         loaderManager = LoaderManager.getInstance(this);
         recyclerViewPosters = findViewById(R.id.recyclerViewPosters);
@@ -184,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 //            }
 //        }
 
-        URL url = NetworkUtils.buildURl(methodOfSort, page);
+        URL url = NetworkUtils.buildURl(methodOfSort, page, lang);
         Bundle bundle = new Bundle();
         bundle.putString("url", url.toString());
         loaderManager.restartLoader(LOADER_ID, bundle, this);
